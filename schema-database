@@ -1,0 +1,59 @@
+CREATE DATABASE conectados_seguros2;
+USE conectados_seguros2;
+
+CREATE TABLE usuarios2 (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(80) NOT NULL,
+    gmail VARCHAR(120) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    rol ENUM('admin', 'usuario') DEFAULT 'usuario',
+    fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE categorias_ciberdelitos (
+    id_categoria INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    descripcion TEXT
+);
+
+CREATE TABLE ciberdelitos_info (
+    id_ciberdelito INT AUTO_INCREMENT PRIMARY KEY,
+    id_categoria INT NOT NULL,
+    titulo VARCHAR(150) NOT NULL,
+    descripcion TEXT NOT NULL,
+    recomendaciones TEXT,
+    FOREIGN KEY (id_categoria) REFERENCES categorias_ciberdelitos(id_categoria)
+);
+
+CREATE TABLE recursos (
+    id_recurso INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(150) NOT NULL,
+    tipo ENUM('articulo', 'video', 'tutorial') NOT NULL,
+    url VARCHAR(255) NOT NULL,
+    autor VARCHAR(100),
+    fecha_publicacion DATE,
+    UNIQUE(url)
+);
+
+CREATE TABLE foros_temas (
+    id_tema INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    titulo VARCHAR(200) NOT NULL,
+    contenido TEXT NOT NULL,
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios2(id_usuario)
+);
+
+CREATE TABLE foros_respuestas (
+    id_respuesta INT AUTO_INCREMENT PRIMARY KEY,
+    id_tema INT NOT NULL,
+    id_usuario INT NOT NULL,
+    contenido TEXT NOT NULL,
+    fecha_respuesta DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_tema) REFERENCES foros_temas(id_tema),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios2(id_usuario)
+);
+
+CREATE INDEX idx_tema_usuario ON foros_temas(id_usuario);
+CREATE INDEX idx_respuesta_usuario ON foros_respuestas(id_usuario);
+CREATE INDEX idx_categoria ON ciberdelitos_info(id_categoria);
